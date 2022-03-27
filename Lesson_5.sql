@@ -3,7 +3,7 @@ Voronov Sergey*/
 
 -- Практическое задание по теме “Операторы, фильтрация, сортировка и ограничение"
 -- 1
-USE vk;
+USE shop;
 ALTER TABLE users ADD COLUMN updated_at VARCHAR(10);
 
 UPDATE users
@@ -21,8 +21,6 @@ ALTER TABLE users
 	MODIFY COLUMN updated_at DATETIME;
 
 -- 3
-USE shop;
-
 DROP TABLE IF EXISTS storehouses_products;
 CREATE TABLE storehouses_products (
 id SERIAL PRIMARY KEY,
@@ -47,25 +45,36 @@ ORDER BY
 value = 0,
 value;
 
+-- 4
+SELECT id, name, birthday_at 
+FROM users 
+WHERE (birthday_at LIKE '%may%' OR birthday_at LIKE '%august%');
+
+-- 5
+SELECT * FROM catalogs
+WHERE id IN (5, 1, 2)
+ORDER BY FIND_IN_SET(id,'5,1,2');
+
+
 -- Практическое задание теме “Агрегация данных”
 -- 1
-/* Дни рождения находятся в таблице profiles*/
-
-USE vk;
-ALTER TABLE profiles
+ALTER TABLE users
 ADD age INT NOT NULL;
 
-UPDATE profiles
-SET age = TIMESTAMPDIFF(YEAR, birthday, NOW());
+UPDATE users
+SET age = TIMESTAMPDIFF(YEAR, birthday_at, NOW());
 
-SELECT ROUND(AVG(TIMESTAMPDIFF(YEAR, birthday, NOW())), 0)
-AS AVG_Age FROM profiles;
+SELECT ROUND(AVG(TIMESTAMPDIFF(YEAR, birthday_at, NOW())), 0)
+AS AVG_Age FROM users;
 
 
 -- 2
-SELECT DATE_FORMAT(DATE(CONCAT_WS('-', YEAR(NOW()), MONTH(birthday), DAY(birthday))), '%W') AS day,
+SELECT DATE_FORMAT(DATE(CONCAT_WS('-', YEAR(NOW()), MONTH(birthday_at), DAY(birthday_at))), '%W') AS day,
 COUNT(*) AS total
-FROM profiles
+FROM users
 GROUP BY day
 ORDER BY total;
 
+-- 3
+SELECT ROUND(EXP(SUM(LOG(id))), 10)
+FROM users;
